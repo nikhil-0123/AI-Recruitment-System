@@ -1,17 +1,15 @@
-version: '3.8'
-
 services:
   # The Database
   db:
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg15
     container_name: ai_recruitment_db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: devpassword123
-      POSTGRES_DB: recruitment_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345678
+      POSTGRES_DB: aras_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
