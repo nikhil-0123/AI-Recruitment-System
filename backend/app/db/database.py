@@ -1,5 +1,3 @@
-# backend/app/db/database.py
-
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
