@@ -53,6 +53,11 @@ class Skill(Base):
 
     __table_args__ = (
         sa.Index(
+            "idx_skills_skill_name",
+            "skill_name",
+            unique=True,
+        ),
+        sa.Index(
             "idx_skills_category",
             "category",
         ),

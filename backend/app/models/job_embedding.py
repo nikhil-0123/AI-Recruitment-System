@@ -40,7 +40,6 @@ class JobEmbedding(Base):
             ondelete="CASCADE",
         ),
         nullable=False,
-        unique=True,
     )
 
     embedding: Mapped[list[float]] = mapped_column(
@@ -65,6 +64,18 @@ class JobEmbedding(Base):
     )
 
     __table_args__ = (
+        sa.Index(
+            "idx_job_embeddings_job_id",
+            "job_id",
+            unique=True,
+        ),
+        sa.Index(
+            "idx_job_vector",
+            "embedding",
+            postgresql_using="ivfflat",
+            postgresql_ops={"embedding": "vector_cosine_ops"},
+            postgresql_with={"lists": 100},
+        ),
         {
             "comment": (
                 "Semantic vector embeddings generated from job "

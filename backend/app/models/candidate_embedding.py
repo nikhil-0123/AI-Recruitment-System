@@ -25,7 +25,6 @@ class CandidateEmbedding(Base):
             ondelete="CASCADE",
         ),
         nullable=False,
-        unique=True,
     )
 
     embedding: Mapped[list[float]] = mapped_column(
@@ -52,6 +51,13 @@ class CandidateEmbedding(Base):
             "idx_candidate_embeddings_candidate_id",
             "candidate_id",
             unique=True,
+        ),
+        sa.Index(
+            "idx_candidate_vector",
+            "embedding",
+            postgresql_using="ivfflat",
+            postgresql_ops={"embedding": "vector_cosine_ops"},
+            postgresql_with={"lists": 100},
         ),
         {
             "comment": (
