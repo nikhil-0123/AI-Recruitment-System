@@ -112,8 +112,14 @@ def _register_routers(application: FastAPI) -> None:
       Sprint 7: analytics_router, reports_router
     """
     from app.api.v1.health import router as health_router
+    from app.api.v1.jobs import router as jobs_router
+    from app.api.v1.candidates import router as candidates_router
+    from app.api.v1.resumes import router as resumes_router
 
     application.include_router(health_router)
+    application.include_router(jobs_router)
+    application.include_router(candidates_router)
+    application.include_router(resumes_router)
 
 
 # ── Module-Level App Instance ──────────────────────────────────────────────────
