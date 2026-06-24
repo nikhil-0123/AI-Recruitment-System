@@ -10,8 +10,9 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from app.core.config import settings
 
-# Single import registers all 11 Day 3 models via app/db/base.py
+# Ensure all ORM models are imported so Base.metadata includes the full schema.
 from app.db.base import Base  # noqa: F401
+import app.models  # noqa: F401
 
 config = context.config
 

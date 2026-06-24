@@ -1,4 +1,3 @@
-# backend/alembic/versions/002_create_v1_core_tables.py
 """Create V1 core tables for ARAS hiring workflow
 
 Revision ID: 002

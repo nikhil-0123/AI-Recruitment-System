@@ -14,21 +14,17 @@ if TYPE_CHECKING:
 
 class Skill(Base):
     """
-    Master catalog of normalized skills.
+    Master skill catalog used across ARAS.
+
+    Referenced by:
+    - candidate_skills
+    - job_skills
 
     Examples:
     - Python
     - FastAPI
     - PostgreSQL
     - Docker
-    - AWS
-
-    Used by:
-    - candidate_skills
-    - job_skills
-    - matching engine
-    - ranking engine
-    - explainable AI (XAI)
     """
 
     __tablename__ = "skills"
@@ -36,15 +32,12 @@ class Skill(Base):
     skill_name: Mapped[str] = mapped_column(
         sa.String(100),
         nullable=False,
-        unique=True,
     )
 
     category: Mapped[str | None] = mapped_column(
         sa.String(100),
         nullable=True,
     )
-
-    # Relationships
 
     candidate_skills: Mapped[list["CandidateSkill"]] = relationship(
         "CandidateSkill",
@@ -59,11 +52,19 @@ class Skill(Base):
     )
 
     __table_args__ = (
-        sa.Index("idx_skills_category", "category"),
+        sa.Index(
+            "idx_skills_skill_name",
+            "skill_name",
+            unique=True,
+        ),
+        sa.Index(
+            "idx_skills_category",
+            "category",
+        ),
         {
             "comment": (
-                "Master catalog of normalized skills used for "
-                "candidate matching, ranking, and explainable AI."
+                "Master catalog of skills used for candidate "
+                "matching, ranking, and analytics."
             )
         },
     )
@@ -72,6 +73,6 @@ class Skill(Base):
         return (
             f"Skill("
             f"id={self.id}, "
-            f"skill_name='{self.skill_name}'"
+            f"name='{self.skill_name}'"
             f")"
         )

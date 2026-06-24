@@ -15,21 +15,6 @@ if TYPE_CHECKING:
 
 
 class CandidateEmbedding(Base):
-    """
-    Semantic embedding generated from a candidate resume.
-
-    Model:
-        sentence-transformers/all-MiniLM-L6-v2
-
-    Embedding Dimension:
-        384
-
-    Used by:
-    - Semantic Matching
-    - Candidate Ranking
-    - Explainable AI (XAI)
-    """
-
     __tablename__ = "candidate_embeddings"
 
     candidate_id: Mapped[uuid.UUID] = mapped_column(
@@ -40,7 +25,6 @@ class CandidateEmbedding(Base):
             ondelete="CASCADE",
         ),
         nullable=False,
-        unique=True,
     )
 
     embedding: Mapped[list[float]] = mapped_column(
@@ -55,8 +39,6 @@ class CandidateEmbedding(Base):
         server_default="all-MiniLM-L6-v2",
     )
 
-    # Relationships
-
     candidate: Mapped["Candidate"] = relationship(
         "Candidate",
         back_populates="candidate_embedding",
@@ -65,10 +47,22 @@ class CandidateEmbedding(Base):
     )
 
     __table_args__ = (
+        sa.Index(
+            "idx_candidate_embeddings_candidate_id",
+            "candidate_id",
+            unique=True,
+        ),
+        sa.Index(
+            "idx_candidate_vector",
+            "embedding",
+            postgresql_using="ivfflat",
+            postgresql_ops={"embedding": "vector_cosine_ops"},
+            postgresql_with={"lists": 100},
+        ),
         {
             "comment": (
-                "Semantic vector embeddings generated from candidate "
-                "resumes for AI matching, ranking, and explainable AI."
+                "Stores candidate semantic embeddings generated "
+                "from resume content using sentence transformers."
             )
         },
     )

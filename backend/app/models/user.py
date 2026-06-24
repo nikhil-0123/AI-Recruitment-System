@@ -1,7 +1,8 @@
+# backend/app/models/user.py
+
 from __future__ import annotations
 
-import enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -11,11 +12,6 @@ from app.db.base import Base
 if TYPE_CHECKING:
     from app.models.job import Job
     from app.models.audit_log import AuditLog
-
-
-class UserRole(str, enum.Enum):
-    ADMIN = "ADMIN"
-    RECRUITER = "RECRUITER"
 
 
 class User(Base):
@@ -32,10 +28,11 @@ class User(Base):
         nullable=False,
     )
 
+    # Removed unique=True from the column to prevent Alembic clash
+    # The constraint is handled safely in __table_args__ below
     email: Mapped[str] = mapped_column(
         sa.String(255),
         nullable=False,
-        unique=True,
     )
 
     password_hash: Mapped[str] = mapped_column(
@@ -43,11 +40,12 @@ class User(Base):
         nullable=False,
     )
 
-    role: Mapped[UserRole] = mapped_column(
-        sa.Enum(UserRole, name="user_role"),
+    # Changed from Enum to String(30) to match the database exactly
+    role: Mapped[str] = mapped_column(
+        sa.String(30),
         nullable=False,
-        default=UserRole.RECRUITER,
-        server_default=UserRole.RECRUITER.value,
+        default="RECRUITER",
+        server_default="RECRUITER",
     )
 
     is_active: Mapped[bool] = mapped_column(
@@ -57,21 +55,23 @@ class User(Base):
         server_default=sa.true(),
     )
 
-    # Relationships
+    # ── Relationships ──────────────────────────────────────────────────────────
 
-    jobs: Mapped[list["Job"]] = relationship(
+    jobs: Mapped[List["Job"]] = relationship(
         "Job",
         back_populates="recruiter",
         lazy="raise",
     )
 
-    audit_logs: Mapped[list["AuditLog"]] = relationship(
+    audit_logs: Mapped[List["AuditLog"]] = relationship(
         "AuditLog",
         back_populates="user",
         lazy="raise",
     )
 
+    # ── Indexes ────────────────────────────────────────────────────────────────
     __table_args__ = (
+        sa.Index("idx_users_email", "email", unique=True),
         sa.Index("idx_users_role", "role"),
         sa.Index("idx_users_is_active", "is_active"),
         {
@@ -80,10 +80,4 @@ class User(Base):
     )
 
     def __repr__(self) -> str:
-        return (
-            f"User("
-            f"id={self.id}, "
-            f"email='{self.email}', "
-            f"role='{self.role.value}'"
-            f")"
-        )
+        return f"<User(id={self.id}, role={self.role!r})>"

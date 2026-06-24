@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import enum
 import uuid
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import UUID
@@ -15,22 +14,25 @@ if TYPE_CHECKING:
     from app.models.candidate import Candidate
 
 
-class ParsingStatus(str, enum.Enum):
-    PENDING = "PENDING"
-    PROCESSING = "PROCESSING"
-    COMPLETED = "COMPLETED"
-    FAILED = "FAILED"
-
-
 class Resume(Base):
     """
-    Resume uploaded by or for a candidate.
+    ORM model for the `resumes` table.
+    Source: 08_Database_Design.md Section 8
 
-    Supports:
-    - Resume Upload
-    - Resume Parsing
-    - Skill Extraction
-    - Embedding Generation
+    Column         | Type          | Constraint
+    -----------------------------------------------
+    id             | UUID          | PK (from Base)
+    candidate_id   | UUID          | FK → candidates.id NOT NULL
+    file_name      | TEXT          | NOT NULL
+    file_url       | TEXT          | nullable
+    file_type      | VARCHAR(20)   | nullable
+    file_size      | BIGINT        | nullable
+    parsing_status | VARCHAR(50)   | NOT NULL DEFAULT 'pending'
+    uploaded_at    | TIMESTAMPTZ   | NOT NULL DEFAULT NOW()
+
+    NOTE: Document column is `file_url` NOT `file_path`.
+    NOTE: Document column is `parsing_status` NOT `upload_status`.
+    NOTE: Document timestamp is `uploaded_at` NOT `created_at`.
     """
 
     __tablename__ = "resumes"
@@ -39,8 +41,8 @@ class Resume(Base):
         UUID(as_uuid=True),
         sa.ForeignKey(
             "candidates.id",
-            name="fk_resumes_candidate_id_candidates",
             ondelete="CASCADE",
+            name="fk_resumes_candidate_id_candidates",
         ),
         nullable=False,
     )
@@ -50,26 +52,26 @@ class Resume(Base):
         nullable=False,
     )
 
-    file_url: Mapped[str | None] = mapped_column(
+    file_url: Mapped[Optional[str]] = mapped_column(
         sa.Text,
         nullable=True,
     )
 
-    file_type: Mapped[str | None] = mapped_column(
+    file_type: Mapped[Optional[str]] = mapped_column(
         sa.String(20),
         nullable=True,
     )
 
-    file_size: Mapped[int | None] = mapped_column(
+    file_size: Mapped[Optional[int]] = mapped_column(
         sa.BigInteger,
         nullable=True,
     )
 
-    parsing_status: Mapped[ParsingStatus] = mapped_column(
-        sa.Enum(ParsingStatus, name="parsing_status"),
+    parsing_status: Mapped[str] = mapped_column(
+        sa.String(50),
         nullable=False,
-        default=ParsingStatus.PENDING,
-        server_default=ParsingStatus.PENDING.value,
+        default="pending",
+        server_default="pending",
     )
 
     uploaded_at: Mapped[datetime] = mapped_column(
@@ -79,29 +81,21 @@ class Resume(Base):
         server_default=sa.func.now(),
     )
 
-    # Relationships
-
+    # ── Relationships ──────────────────────────────────────────────────────────
     candidate: Mapped["Candidate"] = relationship(
         "Candidate",
         back_populates="resumes",
         lazy="raise",
     )
 
+    # ── Indexes ────────────────────────────────────────────────────────────────
     __table_args__ = (
         sa.Index("idx_resumes_candidate_id", "candidate_id"),
         sa.Index("idx_resumes_parsing_status", "parsing_status"),
-        {
-            "comment": (
-                "Candidate resume files used for parsing, "
-                "skill extraction, matching, and ranking."
-            )
-        },
     )
 
     def __repr__(self) -> str:
         return (
-            f"Resume("
-            f"id={self.id}, "
-            f"status='{self.parsing_status.value}'"
-            f")"
+            f"<Resume(id={self.id}, "
+            f"parsing_status={self.parsing_status!r})>"
         )
