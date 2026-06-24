@@ -54,7 +54,6 @@ class JobEmbedding(Base):
         server_default="all-MiniLM-L6-v2",
     )
 
-    # Relationships
 
     job: Mapped["Job"] = relationship(
         "Job",
