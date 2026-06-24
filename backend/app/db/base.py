@@ -51,29 +51,3 @@ class Base(DeclarativeBase):
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}(id={self.id})>"
-
-
-# ── Model Registration for Alembic Autogenerate ───────────────────────────────
-# Import order follows FK dependency chain.
-# Any module importing `Base` gets all models registered automatically.
-
-# Layer 1 — No FK dependencies
-from app.models.user import User                            # noqa: F401, E402
-from app.models.candidate import Candidate                  # noqa: F401, E402
-
-# Layer 2 — FK → Layer 1
-from app.models.job import Job                             # noqa: F401, E402
-from app.models.resume import Resume                       # noqa: F401, E402
-
-# Layer 3 — Skill master (no FK to above)
-from app.models.skill import Skill                         # noqa: F401, E402
-
-# Layer 4 — FK → Layer 1 + 2 + 3
-from app.models.candidate_skill import CandidateSkill      # noqa: F401, E402
-from app.models.job_skill import JobSkill                  # noqa: F401, E402
-from app.models.candidate_embedding import CandidateEmbedding  # noqa: F401, E402
-from app.models.job_embedding import JobEmbedding          # noqa: F401, E402
-
-# Layer 5 — FK → Layer 1 + 2 + 4
-from app.models.candidate_score import CandidateScore      # noqa: F401, E402
-from app.models.audit_log import AuditLog                  # noqa: F401, E402

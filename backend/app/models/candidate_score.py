@@ -1,3 +1,5 @@
+# backend/app/models/candidate_score.py
+
 from __future__ import annotations
 
 import uuid
@@ -16,16 +18,46 @@ if TYPE_CHECKING:
 
 
 class CandidateScore(Base):
-    """Source: 08_Database_Design.md Section 12 & Scope Update - XAI fields"""
-    
+    """
+    ORM model for the `candidate_scores` table.
+    Source: 08_Database_Design.md Section 12
+    Source: ARAS-Project-Scope-Update-Mandatory.md — XAI fields
+
+    Column            | Type           | Constraint
+    ---------------------------------------------------
+    id                | UUID           | PK (from Base)
+    candidate_id      | UUID           | FK → candidates.id NOT NULL
+    job_id            | UUID           | FK → jobs.id NOT NULL
+    skill_score       | NUMERIC(5,2)   | nullable
+    experience_score  | NUMERIC(5,2)   | nullable
+    education_score   | NUMERIC(5,2)   | nullable
+    semantic_score    | NUMERIC(5,2)   | nullable
+    ai_score          | NUMERIC(5,2)   | nullable (from base doc)
+    final_score       | NUMERIC(5,2)   | nullable
+    rank_position     | INTEGER        | nullable
+    matched_skills    | JSONB          | nullable — XAI field
+    missing_skills    | JSONB          | nullable — XAI field
+    recommendation    | TEXT           | nullable — XAI field
+    created_at        | TIMESTAMPTZ    | (from Base)
+
+    XAI fields (matched_skills, missing_skills, recommendation) are
+    required by the updated V1 scope for Explainable AI.
+    Source: ARAS-Project-Scope-Update-Mandatory.md Section 'Candidate Score Breakdown'
+
+    Example XAI payload:
+    matched_skills = ["Python", "FastAPI", "Docker"]
+    missing_skills = ["AWS"]
+    recommendation = "Strong match. Recommended for interview."
+    """
+
     __tablename__ = "candidate_scores"
 
     candidate_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         sa.ForeignKey(
             "candidates.id",
-            name="fk_candidate_scores_candidate_id_candidates",
             ondelete="CASCADE",
+            name="fk_candidate_scores_candidate_id_candidates",
         ),
         nullable=False,
     )
@@ -34,38 +66,71 @@ class CandidateScore(Base):
         UUID(as_uuid=True),
         sa.ForeignKey(
             "jobs.id",
-            name="fk_candidate_scores_job_id_jobs",
             ondelete="CASCADE",
+            name="fk_candidate_scores_job_id_jobs",
         ),
         nullable=False,
     )
 
-    # ── Score Components ───────────────────────────────────────────────────────
-    skill_score: Mapped[Optional[Decimal]] = mapped_column(sa.Numeric(5, 2), nullable=True)
-    experience_score: Mapped[Optional[Decimal]] = mapped_column(sa.Numeric(5, 2), nullable=True)
-    education_score: Mapped[Optional[Decimal]] = mapped_column(sa.Numeric(5, 2), nullable=True)
-    semantic_score: Mapped[Optional[Decimal]] = mapped_column(sa.Numeric(5, 2), nullable=True)
-    ai_score: Mapped[Optional[Decimal]] = mapped_column(sa.Numeric(5, 2), nullable=True)
-    final_score: Mapped[Optional[Decimal]] = mapped_column(sa.Numeric(5, 2), nullable=True)
-    rank_position: Mapped[Optional[int]] = mapped_column(sa.Integer, nullable=True)
+    # ── Scoring Dimensions ────────────────────────────────────────────────────
+    # Source: AI_Model.md Section 9 — Scoring Components
+    # Weights: Semantic 35%, Skill 25%, Experience 20%, Education 10%, AI 10%
 
-    # ── Explainable AI Fields ──────────────────────────────────────────────────
+    skill_score: Mapped[Optional[Decimal]] = mapped_column(
+        sa.Numeric(5, 2),
+        nullable=True,
+    )
+
+    experience_score: Mapped[Optional[Decimal]] = mapped_column(
+        sa.Numeric(5, 2),
+        nullable=True,
+    )
+
+    education_score: Mapped[Optional[Decimal]] = mapped_column(
+        sa.Numeric(5, 2),
+        nullable=True,
+    )
+
+    semantic_score: Mapped[Optional[Decimal]] = mapped_column(
+        sa.Numeric(5, 2),
+        nullable=True,
+    )
+
+    ai_score: Mapped[Optional[Decimal]] = mapped_column(
+        sa.Numeric(5, 2),
+        nullable=True,
+    )
+
+    final_score: Mapped[Optional[Decimal]] = mapped_column(
+        sa.Numeric(5, 2),
+        nullable=True,
+    )
+
+    rank_position: Mapped[Optional[int]] = mapped_column(
+        sa.Integer,
+        nullable=True,
+    )
+
+    # ── XAI Fields ─────────────────────────────────────────────────────────────
+    # Source: ARAS-Project-Scope-Update-Mandatory.md — Candidate Score Breakdown
+    # These fields make ARAS explainable. They are first-class V1 features.
+
     matched_skills: Mapped[Optional[List[str]]] = mapped_column(
         JSONB,
         nullable=True,
-        comment="Skills matched between candidate and job.",
+        comment="Skills the candidate has that the job requires. Supports XAI.",
     )
 
     missing_skills: Mapped[Optional[List[str]]] = mapped_column(
         JSONB,
         nullable=True,
-        comment="Required skills not found in candidate profile.",
+        comment="Skills the job requires that the candidate lacks. Supports XAI.",
     )
 
     recommendation: Mapped[Optional[str]] = mapped_column(
         sa.Text,
         nullable=True,
-        comment="Human-readable recommendation generated by ranking engine.",
+        comment="Ranking recommendation text generated by the ranking engine.",
     )
 
     # ── Relationships ──────────────────────────────────────────────────────────
@@ -83,24 +148,76 @@ class CandidateScore(Base):
 
     # ── Indexes & Constraints ──────────────────────────────────────────────────
     __table_args__ = (
+        # One score record per candidate per job
         sa.UniqueConstraint(
             "candidate_id",
             "job_id",
             name="uq_candidate_scores_candidate_job",
         ),
-        sa.CheckConstraint("rank_position > 0", name="ck_candidate_scores_rank_positive"),
-        sa.CheckConstraint("skill_score >= 0 AND skill_score <= 100", name="ck_candidate_scores_skill_score"),
-        sa.CheckConstraint("experience_score >= 0 AND experience_score <= 100", name="ck_candidate_scores_experience_score"),
-        sa.CheckConstraint("education_score >= 0 AND education_score <= 100", name="ck_candidate_scores_education_score"),
-        sa.CheckConstraint("semantic_score >= 0 AND semantic_score <= 100", name="ck_candidate_scores_semantic_score"),
-        sa.CheckConstraint("ai_score >= 0 AND ai_score <= 100", name="ck_candidate_scores_ai_score"),
-        sa.CheckConstraint("final_score >= 0 AND final_score <= 100", name="ck_candidate_scores_final_score"),
-        
-        sa.Index("idx_candidate_scores_final_score", "final_score"),
-        sa.Index("idx_candidate_scores_candidate_id", "candidate_id"),
-        sa.Index("idx_candidate_scores_job_id", "job_id"),
-        sa.Index("idx_candidate_scores_rank_position", "rank_position"),
-        sa.Index("idx_candidate_scores_job_rank", "job_id", "rank_position"),
+
+        # Score validations
+        sa.CheckConstraint(
+            "skill_score >= 0 AND skill_score <= 100",
+            name="ck_candidate_scores_skill_score",
+        ),
+
+        sa.CheckConstraint(
+            "experience_score >= 0 AND experience_score <= 100",
+            name="ck_candidate_scores_experience_score",
+        ),
+
+        sa.CheckConstraint(
+            "education_score >= 0 AND education_score <= 100",
+            name="ck_candidate_scores_education_score",
+        ),
+
+        sa.CheckConstraint(
+            "semantic_score >= 0 AND semantic_score <= 100",
+            name="ck_candidate_scores_semantic_score",
+        ),
+
+        sa.CheckConstraint(
+            "ai_score >= 0 AND ai_score <= 100",
+            name="ck_candidate_scores_ai_score",
+        ),
+
+        sa.CheckConstraint(
+            "final_score >= 0 AND final_score <= 100",
+            name="ck_candidate_scores_final_score",
+        ),
+
+        sa.CheckConstraint(
+            "rank_position > 0",
+            name="ck_candidate_scores_rank_positive",
+        ),
+
+        # Indexes
+        sa.Index(
+            "idx_candidate_scores_final_score",
+            "final_score",
+        ),
+
+        sa.Index(
+            "idx_candidate_scores_candidate_id",
+            "candidate_id",
+        ),
+
+        sa.Index(
+            "idx_candidate_scores_job_id",
+            "job_id",
+        ),
+
+        sa.Index(
+            "idx_candidate_scores_rank_position",
+            "rank_position",
+        ),
+
+        sa.Index(
+            "idx_candidate_scores_job_rank",
+            "job_id",
+            "rank_position",
+        ),
+
         {
             "comment": (
                 "Stores candidate ranking results, score breakdowns, "
@@ -108,6 +225,12 @@ class CandidateScore(Base):
             )
         },
     )
-
+    
     def __repr__(self) -> str:
-        return f"<CandidateScore(id={self.id}, final_score={self.final_score}, rank={self.rank_position})>"
+        return (
+            f"CandidateScore("
+            f"id={self.id}, "
+            f"final_score={self.final_score}, "
+            f"rank={self.rank_position}"
+            f")"
+        )

@@ -78,9 +78,21 @@ class CandidateSkill(Base):
     __table_args__ = (
         # Prevent duplicate skill entries per candidate
         sa.UniqueConstraint(
-            "candidate_id", "skill_id",
+            "candidate_id",
+            "skill_id",
             name="uq_candidate_skills_candidate_skill",
         ),
+
+        sa.CheckConstraint(
+            "proficiency_score >= 0",
+            name="ck_candidate_skill_score_min",
+        ),
+
+        sa.CheckConstraint(
+            "proficiency_score <= 100",
+            name="ck_candidate_skill_score_max",
+        ),
+
         sa.Index("idx_candidate_skills_candidate_id", "candidate_id"),
         sa.Index("idx_candidate_skills_skill_id", "skill_id"),
     )
