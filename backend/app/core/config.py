@@ -48,7 +48,7 @@ class Settings(BaseSettings):
 
     # ── Database — PostgreSQL only (localhost for Day 2) ──────────────────────
     DATABASE_URL: str = Field(
-        default="postgresql+asyncpg://aras_user:aras_password@localhost:5432/aras_db"
+        default="postgresql+asyncpg://postgres:12345678@localhost:5433/aras_db"
     )
     DATABASE_POOL_SIZE: int = Field(default=5, ge=1, le=50)
     DATABASE_MAX_OVERFLOW: int = Field(default=10, ge=0, le=100)
@@ -80,6 +80,21 @@ class Settings(BaseSettings):
         default="console",
         pattern="^(console|json)$",
     )
+
+    # ── Embeddings / Ranking (Sprint 5 Phase 2) ─────────────────────────────
+    # Choose embedding backend: 'stub' (ai_engine) or 'sentence_transformers'
+    EMBEDDING_BACKEND: str = Field(default="stub")
+    EMBEDDING_MODEL: str = Field(default="all-MiniLM-L6-v2")
+
+    # Ranking component weights (must sum to <= 1.0; remaining weight treated as reserved/AI fallback)
+    RANK_WEIGHT_SEMANTIC: float = Field(default=0.35)
+    RANK_WEIGHT_SKILL: float = Field(default=0.25)
+    RANK_WEIGHT_EXPERIENCE: float = Field(default=0.20)
+    RANK_WEIGHT_EDUCATION: float = Field(default=0.10)
+    RANK_WEIGHT_AI: float = Field(default=0.10)
+    
+    # Celery / Redis broker for async jobs
+    CELERY_BROKER_URL: str = Field(default="redis://localhost:6379/0")
 
 
 @lru_cache(maxsize=1)
