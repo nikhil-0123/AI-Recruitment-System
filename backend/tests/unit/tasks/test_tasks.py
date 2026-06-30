@@ -37,7 +37,7 @@ async def test_generate_ranking_task_success(monkeypatch, async_session: AsyncSe
         async def generate_ranking(self, db, jid):
             assert jid == job_id
 
-    async def fake_get_db_context():
+    def fake_get_db_context():
         class DummyContext:
             async def __aenter__(self_inner):
                 return async_session
@@ -47,11 +47,18 @@ async def test_generate_ranking_task_success(monkeypatch, async_session: AsyncSe
 
         return DummyContext()
 
-    monkeypatch.setattr("app.tasks.tasks.get_db_context", lambda: fake_get_db_context())
-    monkeypatch.setattr("app.tasks.tasks.RankingService", lambda: FakeRankingService())
+    monkeypatch.setattr("app.db.database.get_db_context", lambda: fake_get_db_context())
+    monkeypatch.setattr("app.services.ranking_service.RankingService", lambda: FakeRankingService())
     monkeypatch.setattr("app.tasks.tasks.generate_ranking_task", DummyTask())
 
-    result = generate_ranking_task(async_job_id, job_id)
+    # Patch the event loop to return the coroutine so we can await it in this async test
+    class DummyLoop:
+        def run_until_complete(self, coro):
+            return coro
+    monkeypatch.setattr("asyncio.get_event_loop", lambda: DummyLoop())
+
+    result_coro = generate_ranking_task(async_job_id, job_id)
+    result = await result_coro
     assert result["status"] == "completed"
 
     refreshed = await async_session.get(AsyncJob, async_job_id)
@@ -80,7 +87,7 @@ async def test_generate_ranking_task_failure(monkeypatch, async_session: AsyncSe
         async def generate_ranking(self, db, jid):
             raise RuntimeError("ranking failed")
 
-    async def fake_get_db_context():
+    def fake_get_db_context():
         class DummyContext:
             async def __aenter__(self_inner):
                 return async_session
@@ -90,12 +97,18 @@ async def test_generate_ranking_task_failure(monkeypatch, async_session: AsyncSe
 
         return DummyContext()
 
-    monkeypatch.setattr("app.tasks.tasks.get_db_context", lambda: fake_get_db_context())
-    monkeypatch.setattr("app.tasks.tasks.RankingService", lambda: FakeRankingService())
+    monkeypatch.setattr("app.db.database.get_db_context", lambda: fake_get_db_context())
+    monkeypatch.setattr("app.services.ranking_service.RankingService", lambda: FakeRankingService())
     monkeypatch.setattr("app.tasks.tasks.generate_ranking_task", DummyTask())
 
+    # Patch the event loop to return the coroutine so we can await it in this async test
+    class DummyLoop:
+        def run_until_complete(self, coro):
+            return coro
+    monkeypatch.setattr("asyncio.get_event_loop", lambda: DummyLoop())
+
     with pytest.raises(RuntimeError, match="ranking failed"):
-        generate_ranking_task(async_job_id, job_id)
+        await generate_ranking_task(async_job_id, job_id)
 
     refreshed = await async_session.get(AsyncJob, async_job_id)
     assert refreshed.status == "FAILED"
@@ -103,6 +116,21 @@ async def test_generate_ranking_task_failure(monkeypatch, async_session: AsyncSe
 
 
 def test_generate_ranking_task_celery_not_configured(monkeypatch) -> None:
-    monkeypatch.setattr("app.tasks.celery_app.celery_app", None)
-    with pytest.raises(RuntimeError, match="Celery is not configured"):
-        generate_ranking_task()
+    import importlib
+    import app.tasks.tasks
+    import app.tasks.celery_app
+    
+    # Mock celery_app as None
+    monkeypatch.setattr(app.tasks.celery_app, "celery_app", None)
+    
+    # Reload the tasks module to evaluate the 'else' block
+    importlib.reload(app.tasks.tasks)
+    
+    try:
+        with pytest.raises(RuntimeError, match="Celery is not configured"):
+            # Use the correct intended signature for the task
+            app.tasks.tasks.generate_ranking_task("dummy_async_job_id", "dummy_job_id")
+    finally:
+        # Restore original state so subsequent tests don't fail
+        monkeypatch.undo()
+        importlib.reload(app.tasks.tasks)

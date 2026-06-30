@@ -15,7 +15,7 @@ from app.core.config import Settings
 from app.db.base import Base
 from app.models.user import User
 
-ROOT_DIR = Path(__file__).resolve().parents[3]
+ROOT_DIR = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT_DIR / ".env")
 
 
