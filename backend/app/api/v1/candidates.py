@@ -4,7 +4,7 @@ from datetime import datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
@@ -17,12 +17,12 @@ router = APIRouter(prefix="/candidates", tags=["Candidates"])
 
 
 class CandidateCreateRequest(BaseModel):
-    full_name: str = Field(..., example="Alice Smith")
-    email: str | None = Field(None, example="alice@example.com")
-    phone: str | None = Field(None, example="555-0100")
-    linkedin_url: str | None = Field(None, example="https://linkedin.com/in/alice")
-    experience_years: float | None = Field(None, example=3.5)
-    education: str | None = Field(None, example="Bachelor of Science")
+    full_name: str = Field(..., json_schema_extra={"example": "Alice Smith"})
+    email: str | None = Field(None, json_schema_extra={"example": "alice@example.com"})
+    phone: str | None = Field(None, json_schema_extra={"example": "555-0100"})
+    linkedin_url: str | None = Field(None, json_schema_extra={"example": "https://linkedin.com/in/alice"})
+    experience_years: float | None = Field(None, json_schema_extra={"example": 3.5})
+    education: str | None = Field(None, json_schema_extra={"example": "Bachelor of Science"})
 
 
 class CandidateResponse(BaseModel):
@@ -36,8 +36,7 @@ class CandidateResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CandidateCreateResponse(BaseModel):

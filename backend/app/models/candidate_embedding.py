@@ -39,6 +39,13 @@ class CandidateEmbedding(Base):
         server_default="all-MiniLM-L6-v2",
     )
 
+    model_version: Mapped[str] = mapped_column(
+        sa.String(50),
+        nullable=False,
+        default="1.0",
+        server_default="1.0",
+    )
+
     candidate: Mapped["Candidate"] = relationship(
         "Candidate",
         back_populates="candidate_embedding",

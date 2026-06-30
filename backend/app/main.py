@@ -51,6 +51,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # ── SHUTDOWN ───────────────────────────────────────────────────────────────
     await close_database_connections()
     logger.info("aras_shutdown", message="ARAS API shutdown complete.")
+    # Note: Celery workers run in separate processes; no in-process worker to stop.
 
 
 # ── Application Factory ────────────────────────────────────────────────────────
@@ -115,11 +116,13 @@ def _register_routers(application: FastAPI) -> None:
     from app.api.v1.jobs import router as jobs_router
     from app.api.v1.candidates import router as candidates_router
     from app.api.v1.resumes import router as resumes_router
+    from app.api.v1.rankings import router as rankings_router
 
     application.include_router(health_router)
     application.include_router(jobs_router)
     application.include_router(candidates_router)
     application.include_router(resumes_router)
+    application.include_router(rankings_router)
 
 
 # ── Module-Level App Instance ──────────────────────────────────────────────────

@@ -44,7 +44,7 @@ async def async_engine() -> AsyncEngine:
 @pytest_asyncio.fixture(autouse=True)
 async def prepare_database(async_engine: AsyncEngine) -> None:
     async with async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all, tables=[User.__table__])
+        await conn.run_sync(Base.metadata.create_all)
 
 
 @pytest_asyncio.fixture

@@ -21,6 +21,8 @@ def test_day3_tables_registered() -> None:
         "candidate_scores",
         "audit_logs",
     }
+    # async_jobs table introduced in Sprint 5 Phase 2
+    expected.add("async_jobs")
 
     assert set(Base.metadata.tables) == expected
 

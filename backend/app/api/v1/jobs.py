@@ -4,7 +4,7 @@ from datetime import datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
@@ -17,20 +17,20 @@ router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
 
 class JobCreateRequest(BaseModel):
-    title: str = Field(..., example="Backend Developer")
-    description: str = Field(..., example="FastAPI developer with PostgreSQL experience")
+    title: str = Field(..., json_schema_extra={"example": "Backend Developer"})
+    description: str = Field(..., json_schema_extra={"example": "FastAPI developer with PostgreSQL experience"})
     recruiter_id: UUID
-    experience_required: int | None = Field(None, example=2)
-    education_required: str | None = Field(None, example="Bachelor Degree")
-    status: str | None = Field(None, example="draft")
+    experience_required: int | None = Field(None, json_schema_extra={"example": 2})
+    education_required: str | None = Field(None, json_schema_extra={"example": "Bachelor Degree"})
+    status: str | None = Field(None, json_schema_extra={"example": "draft"})
 
 
 class JobUpdateRequest(BaseModel):
-    title: str | None = Field(None, example="Backend Engineer")
-    description: str | None = Field(None, example="Build REST APIs")
-    experience_required: int | None = Field(None, example=3)
-    education_required: str | None = Field(None, example="Bachelor Degree")
-    status: str | None = Field(None, example="published")
+    title: str | None = Field(None, json_schema_extra={"example": "Backend Engineer"})
+    description: str | None = Field(None, json_schema_extra={"example": "Build REST APIs"})
+    experience_required: int | None = Field(None, json_schema_extra={"example": 3})
+    education_required: str | None = Field(None, json_schema_extra={"example": "Bachelor Degree"})
+    status: str | None = Field(None, json_schema_extra={"example": "published"})
 
 
 class JobResponse(BaseModel):
@@ -44,8 +44,7 @@ class JobResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class JobCreateResponse(BaseModel):
