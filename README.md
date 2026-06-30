@@ -291,11 +291,14 @@ Day 4+ development will begin only after successful verification.
 
 ---
 
-# License
+## License
 
-This project is currently under development.
+This project is currently under active development.
 
-A license will be added before the first public release.
+Copyright © 2026 Nikhil Chaugule. All rights reserved.
+
+No license has been granted at this stage.
+Licensing terms will be finalized before the first public release.
 
 ---
 
