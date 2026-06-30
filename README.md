@@ -1,168 +1,56 @@
-# AI-Recruitment-System
+# AI Recruitment Automation System (ARAS)
 
-## Quick start
-
-From a fresh clone:
-
-1. Start the supporting services:
-   ```bash
-   docker compose -f deployment/docker-compose.yml up -d db redis
-   ```
-2. Run the database migrations:
-   ```bash
-   cd backend
-   alembic upgrade head
-   ```
-3. Start the FastAPI app:
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-4. Start the Celery worker:
-   ```bash
-   celery -A app.tasks.celery_app worker --loglevel=info --queues default,ai,exports --concurrency=2
-   ```
-
-### Environment variables
-
-The backend reads the following settings from environment variables or a local `.env` file:
-
-- `DATABASE_URL`
-- `CELERY_BROKER_URL`
-
-### Docker Compose services
-
-The deployment stack includes:
-
-- PostgreSQL with pgvector
-- Redis
-- Celery worker
-- Nginx
-=======
-# AI Recruitment System (ARAS)
-
-<div align="center">
-
-### 🚀 Production-Grade AI-Powered Recruitment Platform
-
-**Parse • Match • Rank • Recommend • Hire**
-
-An end-to-end recruitment platform that leverages Artificial Intelligence, Natural Language Processing (NLP), semantic search, and explainable ranking algorithms to automate candidate screening and hiring workflows.
+> An AI-powered recruitment platform that automates resume screening, candidate ranking, skill gap analysis, and recruitment intelligence using Explainable AI (XAI), semantic search, and Large Language Models.
 
 ---
 
-![Python](https://img.shields.io/badge/Python-3.12-blue)
-![FastAPI](https://img.shields.io/badge/FastAPI-Latest-green)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
-![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0-red)
-![Docker](https://img.shields.io/badge/Docker-Ready-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
+## Project Status
 
-</div>
+**Current Phase:** Day 1–3 Verification (Audit)
 
----
+**Version:** v0.1.0
 
-# Overview
+**Branch:** `audit/day1-day3`
 
-AI Recruitment System (ARAS) is a modern recruitment platform that automates the hiring pipeline using AI-powered resume analysis, semantic candidate matching, explainable ranking, and intelligent recommendations.
+**Development Status:**
 
-Instead of manually reviewing hundreds of resumes, recruiters upload a Job Description and candidate resumes. The system extracts structured information, evaluates candidate suitability using multiple scoring strategies, and generates transparent rankings with detailed explanations.
+- ✅ Project Foundation
+- ✅ Backend Architecture
+- ✅ Database Models
+- ✅ Documentation
+- 🔄 Day 1–3 Verification
+- ⏳ Day 4 Development
 
 ---
 
 # Features
 
-## Resume Processing
+## Current (Implemented)
 
-* PDF Resume Upload
-* OCR-ready architecture
-* Resume Parsing
-* Skill Extraction
-* Experience Extraction
-* Education Detection
-* Contact Information Extraction
-* Duplicate Detection
+- FastAPI Backend Foundation
+- React + TypeScript Frontend
+- PostgreSQL Database
+- SQLAlchemy ORM
+- Alembic Migrations
+- Repository Pattern
+- Clean Architecture
+- Modular AI Engine
+- Docker Support
+- GitHub Actions CI
+- Comprehensive Project Documentation
 
----
+## Planned
 
-## Job Management
-
-* Create Jobs
-* Update Jobs
-* Delete Jobs
-* Job Requirements
-* Required Skills
-* Preferred Skills
-* Experience Requirements
-* Education Requirements
-
----
-
-## AI Candidate Ranking
-
-* Semantic Matching
-* Skill Matching
-* Experience Score
-* Education Score
-* Keyword Score
-* Weighted Ranking
-* Explainable AI
-* Confidence Score
-
----
-
-## Recommendation Engine
-
-* Best Candidate Detection
-* Skill Gap Analysis
-* Missing Skills
-* Candidate Strengths
-* Improvement Suggestions
-* Hiring Recommendation
-
----
-
-## Dashboard
-
-* Recruiter Dashboard
-* Candidate Statistics
-* Ranking Dashboard
-* Processing Status
-* Analytics
-* Search & Filters
-
----
-
-# System Architecture
-
-```
-Frontend (React)
-
-        │
-
-FastAPI Backend
-
-        │
-
-Business Services
-
-        │
-
-Repository Layer
-
-        │
-
-PostgreSQL Database
-
-        │
-
-AI Services
-
- ├── Resume Parser
- ├── Embedding Engine
- ├── Ranking Engine
- ├── Recommendation Engine
- └── Validation Engine
-```
+- Resume Parsing
+- Job Description Analysis
+- Semantic Candidate Matching
+- AI Candidate Ranking
+- Skill Gap Analysis
+- Explainable AI (XAI)
+- AI Candidate Summaries
+- Interview Question Generation
+- Recruiter Dashboard
+- Analytics & Reports
 
 ---
 
@@ -170,248 +58,244 @@ AI Services
 
 ## Backend
 
-* Python
-* FastAPI
-* SQLAlchemy
-* Alembic
-* PostgreSQL
-* Pydantic
-
-## AI / ML
-
-* Sentence Transformers
-* HuggingFace Transformers
-* spaCy
-* Scikit-learn
-* ONNX Runtime
-* NumPy
-* Pandas
+- Python 3.12+
+- FastAPI
+- SQLAlchemy
+- Alembic
+- PostgreSQL
+- Pydantic
 
 ## Frontend
 
-* React
-* TypeScript
-* Vite
-* TailwindCSS
-* Axios
+- React
+- TypeScript
+- Vite
+
+## AI
+
+- Sentence Transformers
+- Gemini API
+- pgvector
+- PyMuPDF
+- pdfplumber
 
 ## DevOps
 
-* Docker
-* Docker Compose
-* GitHub Actions
-* Nginx
+- Docker
+- Docker Compose
+- GitHub Actions
 
 ---
 
-# Project Structure
+# Repository Structure
 
-```
-AI-Recruitment-System
-
-backend/
-    app/
-        api/
-        core/
-        models/
-        repositories/
-        schemas/
-        services/
-        workers/
-        utils/
-
-frontend/
-    src/
-
-deployment/
-    docker/
-
-docs/
-
-tests/
-
-Project_Documents/
-
-README.md
+```text
+AI-Recruitment-System/
+│
+├── ai_engine/
+├── backend/
+├── frontend/
+├── deployment/
+├── docs/
+├── tests/
+│
+├── CONTRIBUTING.md
+├── Makefile
+└── README.md
 ```
 
 ---
 
-# AI Pipeline
+# Documentation
 
-```
-Upload Resume
+## Requirements
 
-        │
+- Project Vision
+- Software Requirements Specification (SRS)
+- User Stories
+- Use Cases
+- Competitor Analysis
 
-Extract Text
+## Architecture
 
-        │
+- High Level Design
+- Low Level Design
+- Database Design
+- API Specification
+- UI/UX Design
+- AI Model Design
+- Async Job Architecture
+- Data Governance
 
-Parse Resume
+## Project Management
 
-        │
+- Project Roadmap
+- Risk Assessment
+- AI Validation Plan
 
-Normalize Data
+## Audit
 
-        │
+- PROJECT_IMPLEMENTATION_STATUS.md
+- AUDIT_CHECKLIST.md
 
-Generate Embeddings
+---
 
-        │
+# Getting Started
 
-Calculate Scores
+## Clone Repository
 
-        │
-
-Rank Candidates
-
-        │
-
-Generate Recommendations
-
-        │
-
-Display Results
+```bash
+git clone https://github.com/nikhil-0123/AI-Recruitment-System.git
+cd AI-Recruitment-System
 ```
 
 ---
 
-# Candidate Scoring
+## Backend
 
-The final ranking score combines multiple evaluation metrics.
+```bash
+cd backend
 
-```
-Final Score =
+python -m venv .venv
 
-40% Semantic Similarity
+# Windows
+.venv\Scripts\activate
 
-25% Skills Match
-
-15% Experience Match
-
-10% Education Match
-
-5% Certifications
-
-5% Additional Factors
+pip install -r requirements.txt
 ```
 
-All rankings include explainable scoring so recruiters understand why candidates were recommended.
+Run:
+
+```bash
+uvicorn app.main:app --reload
+```
 
 ---
 
-# API Modules
+## Frontend
 
-* Authentication
-* Users
-* Jobs
-* Candidates
-* Resume Upload
-* Resume Parsing
-* Candidate Ranking
-* Recommendations
-* Dashboard
-* Analytics
-* Health Check
+```bash
+cd frontend
+
+npm install
+
+npm run dev
+```
 
 ---
 
-# Security
+## Docker
 
-* JWT Authentication
-* Role-Based Access Control (RBAC)
-* Password Hashing
-* Input Validation
-* SQL Injection Protection
-* Rate Limiting
-* Audit Logs
-* Secure File Upload
-* HTTPS Ready
+```bash
+docker compose -f deployment/docker-compose.yml up --build
+```
 
 ---
 
-# Performance
+# Architecture
 
-* Async FastAPI
-* Background Workers
-* Database Indexing
-* Connection Pooling
-* Pagination
-* Caching
-* Batch Resume Processing
-* Parallel Ranking
+```text
+Frontend
+      │
+      ▼
+FastAPI API Layer
+      │
+      ▼
+Services
+      │
+      ▼
+Repositories
+      │
+      ▼
+PostgreSQL
+
+             │
+             ▼
+
+AI Engine
+
+Resume Parser
+
+↓
+
+Skill Extraction
+
+↓
+
+Embeddings
+
+↓
+
+Matching
+
+↓
+
+Ranking
+
+↓
+
+LLM Intelligence
+```
+
+---
+
+# Development Workflow
+
+```
+main
+│
+develop
+│
+feature/*
+│
+audit/*
+│
+fix/*
+```
+
+Follow the guidelines in **CONTRIBUTING.md**.
 
 ---
 
 # Testing
 
-* Unit Tests
-* Integration Tests
-* API Tests
-* Repository Tests
-* Service Tests
-* Performance Tests
+Backend
+
+```bash
+cd backend
+pytest
+```
 
 ---
 
-# Development Roadmap
+# Documentation Audit
 
-### Phase 1
+Current audit focuses on:
 
-* Authentication
-* Job Management
-* Resume Upload
-* Resume Parsing
+- Day 1
+- Day 2
+- Day 3
 
-### Phase 2
-
-* Candidate Ranking
-* Recommendation Engine
-* Explainable AI
-
-### Phase 3
-
-* Analytics Dashboard
-* Email Notifications
-* Interview Scheduling
-
-### Phase 4
-
-* LLM Resume Insights
-* AI Interview Assistant
-* Multi-language Resume Support
+Day 4+ development will begin only after successful verification.
 
 ---
 
-# Future Enhancements
+# Roadmap
 
-* Resume Chat
-* AI Career Advisor
-* ATS Score Generator
-* Candidate Skill Graph
-* Organization Dashboard
-* AI Resume Improvement
-* Voice Interview Analysis
-* Video Interview Intelligence
-
----
-
-# Contributing
-
-Contributions are welcome.
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push the branch
-5. Open a Pull Request
+- ✅ Phase 1 – Foundation
+- 🔄 Phase 2 – Verification
+- ⏳ Phase 3 – Core APIs
+- ⏳ Phase 4 – AI Services
+- ⏳ Phase 5 – Frontend Features
+- ⏳ Phase 6 – Production Deployment
 
 ---
 
 # License
 
-This project is licensed under the MIT License.
+This project is currently under development.
+
+A license will be added before the first public release.
 
 ---
 
@@ -421,8 +305,10 @@ This project is licensed under the MIT License.
 
 Bachelor of Engineering (Artificial Intelligence & Data Science)
 
-Passionate about AI, Machine Learning, Backend Engineering, Distributed Systems, and Production-Grade Software Development.
+Savitribai Phule Pune University
 
 ---
 
-⭐ If you found this project useful, consider giving it a star!
+## Acknowledgements
+
+This project is being developed as a production-oriented AI Recruitment Automation System with a strong emphasis on software engineering best practices, explainable AI, and scalable architecture.

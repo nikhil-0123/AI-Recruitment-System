@@ -4,7 +4,7 @@ from datetime import datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
@@ -18,11 +18,11 @@ router = APIRouter(prefix="/resumes", tags=["Resumes"])
 
 class ResumeCreateRequest(BaseModel):
     candidate_id: UUID
-    file_name: str = Field(..., example="resume.pdf")
-    file_url: str | None = Field(None, example="https://storage.example.com/resume.pdf")
-    file_type: str | None = Field(None, example="application/pdf")
-    file_size: int | None = Field(None, example=123456)
-    parsing_status: str | None = Field(None, example="pending")
+    file_name: str = Field(..., json_schema_extra={"example": "resume.pdf"})
+    file_url: str | None = Field(None, json_schema_extra={"example": "https://storage.example.com/resume.pdf"})
+    file_type: str | None = Field(None, json_schema_extra={"example": "application/pdf"})
+    file_size: int | None = Field(None, json_schema_extra={"example": 123456})
+    parsing_status: str | None = Field(None, json_schema_extra={"example": "pending"})
 
 
 class ResumeResponse(BaseModel):
@@ -37,8 +37,7 @@ class ResumeResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ResumeCreateResponse(BaseModel):
