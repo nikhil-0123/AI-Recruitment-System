@@ -62,3 +62,13 @@ def decode_access_token(token: str) -> dict[str, Any]:
     if payload.get("type") != "access":
         raise JWTError("Invalid token type")
     return payload
+
+
+def decode_refresh_token(token: str) -> dict[str, Any]:
+    """Decodes and validates a JWT refresh token, enforcing type."""
+    payload = jwt.decode(
+        token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+    )
+    if payload.get("type") != "refresh":
+        raise JWTError("Invalid token type")
+    return payload

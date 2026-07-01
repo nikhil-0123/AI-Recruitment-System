@@ -7,6 +7,7 @@ from app.core.security import (
     create_access_token,
     create_refresh_token,
     decode_access_token,
+    decode_refresh_token,
 )
 from app.core.config import settings
 
@@ -48,8 +49,8 @@ def test_create_refresh_token():
     
     assert isinstance(token, str)
     
-    # decode the token manually since decode_access_token now enforces type="access"
-    payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+    # decode the token to verify claims
+    payload = decode_refresh_token(token)
     assert payload["sub"] == subject
     assert payload["type"] == "refresh"
 
@@ -85,3 +86,27 @@ def test_decode_access_token_rejects_refresh_token():
     # Attempting to decode it as an access token should fail
     with pytest.raises(JWTError, match="Invalid token type"):
         decode_access_token(token)
+
+
+def test_decode_refresh_token_valid():
+    subject = "user123"
+    token = create_refresh_token(subject=subject, expires_delta=timedelta(minutes=5))
+    
+    payload = decode_refresh_token(token)
+    assert payload["sub"] == subject
+
+
+def test_decode_refresh_token_expired():
+    subject = "user123"
+    token = create_refresh_token(subject=subject, expires_delta=timedelta(minutes=-5))
+    
+    with pytest.raises(ExpiredSignatureError):
+        decode_refresh_token(token)
+
+
+def test_decode_refresh_token_rejects_access_token():
+    subject = "user123"
+    token = create_access_token(subject=subject)
+    
+    with pytest.raises(JWTError, match="Invalid token type"):
+        decode_refresh_token(token)
