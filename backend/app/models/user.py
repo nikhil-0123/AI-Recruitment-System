@@ -44,8 +44,8 @@ class User(Base):
     role: Mapped[str] = mapped_column(
         sa.String(30),
         nullable=False,
-        default="RECRUITER",
-        server_default="RECRUITER",
+        default="recruiter",
+        server_default="recruiter",
     )
 
     is_active: Mapped[bool] = mapped_column(
