@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime
 import enum
 import uuid
 from typing import Any
@@ -8,16 +7,12 @@ from typing import Any
 from sqlalchemy import (
     Column,
     DateTime,
-    Enum,
     Integer,
     JSON,
     SmallInteger,
     String,
     Text,
-    text,
 )
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 
 from app.db.base import Base

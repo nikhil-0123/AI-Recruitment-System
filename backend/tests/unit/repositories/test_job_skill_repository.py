@@ -6,7 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.job import Job
 from app.models.skill import Skill
 from app.models.user import User
-from app.models.job_skill import JobSkill
 from app.repositories.job_skill_repository import JobSkillRepository
 
 

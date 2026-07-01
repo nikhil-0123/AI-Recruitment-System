@@ -1,6 +1,6 @@
 import pytest
 from datetime import timedelta
-from jose import jwt, ExpiredSignatureError, JWTError
+from jose import ExpiredSignatureError, JWTError
 from app.core.security import (
     get_password_hash,
     verify_password,
@@ -9,7 +9,6 @@ from app.core.security import (
     decode_access_token,
     decode_refresh_token,
 )
-from app.core.config import settings
 
 
 def test_password_hashing():

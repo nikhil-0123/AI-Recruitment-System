@@ -4,7 +4,6 @@ import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import JSONB
 
 from app.db.base import Base
-import app.models
 
 
 def test_day3_tables_registered() -> None:
