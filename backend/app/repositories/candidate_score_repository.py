@@ -2,14 +2,12 @@ from __future__ import annotations
 
 import uuid
 from decimal import Decimal
-from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.candidate_score import CandidateScore
 from app.repositories.base import BaseRepository
-from app.repositories.exceptions import NotFoundError
 
 
 class CandidateScoreRepository(BaseRepository[CandidateScore]):

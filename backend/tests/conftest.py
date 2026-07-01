@@ -53,3 +53,50 @@ async def async_session(async_engine: AsyncEngine) -> AsyncSession:
     async with maker() as session:
         yield session
         await session.rollback()
+
+
+@pytest.fixture(autouse=True)
+def clear_dependency_overrides():
+    from app.main import app
+    yield
+    app.dependency_overrides = {}
+
+
+@pytest_asyncio.fixture
+async def client(async_session: AsyncSession):
+    from httpx import AsyncClient, ASGITransport
+    from app.main import app
+    from app.db.database import get_db
+
+    app.dependency_overrides[get_db] = lambda: async_session
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        yield ac
+
+
+@pytest_asyncio.fixture
+async def authenticated_test_user(async_session: AsyncSession) -> User:
+    from app.core.security import get_password_hash
+    
+    user = User(
+        name="Test User",
+        email="test_auth@example.com",
+        password_hash=get_password_hash("password123"),
+        is_active=True,
+    )
+    async_session.add(user)
+    await async_session.flush()
+    return user
+
+
+@pytest.fixture
+def jwt_token(authenticated_test_user: User) -> str:
+    from app.core.security import create_access_token
+    return create_access_token(subject=str(authenticated_test_user.id))
+
+
+@pytest.fixture
+def auth_header(jwt_token: str) -> dict[str, str]:
+    return {"Authorization": f"Bearer {jwt_token}"}
+

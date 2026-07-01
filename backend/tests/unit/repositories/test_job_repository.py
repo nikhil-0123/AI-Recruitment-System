@@ -4,7 +4,6 @@ import uuid
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.job import Job
 from app.models.user import User
 from app.repositories.exceptions import NotFoundError
 from app.repositories.job_repository import JobRepository

@@ -5,7 +5,6 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.candidate import Candidate
-from app.models.resume import Resume
 from app.repositories.resume_repository import ResumeRepository
 from app.repositories.exceptions import NotFoundError
 

@@ -162,3 +162,50 @@ async def test_refresh_access_token_user_inactive(mock_decode_refresh_token, aut
 
     with pytest.raises(AuthenticationError, match="User account is inactive"):
         await auth_service.refresh_access_token(mock_db_session, "valid_token_inactive_user")
+
+
+@pytest.mark.asyncio
+@patch("app.services.auth_service.security.get_password_hash")
+async def test_register_success(mock_get_password_hash, auth_service, mock_db_session, mock_user_repo, valid_user):
+    from app.schemas.auth import UserCreate
+    
+    request = UserCreate(
+        name="New User",
+        email="new@example.com",
+        password="password123"
+    )
+    
+    mock_user_repo.get_by_email.return_value = None
+    mock_get_password_hash.return_value = "hashed_pass"
+    mock_user_repo.create.return_value = valid_user
+    
+    result = await auth_service.register(mock_db_session, request)
+    
+    assert result == valid_user
+    mock_user_repo.get_by_email.assert_called_once_with(mock_db_session, "new@example.com")
+    mock_get_password_hash.assert_called_once_with("password123")
+    mock_user_repo.create.assert_called_once_with(
+        mock_db_session,
+        {
+            "email": "new@example.com",
+            "name": "New User",
+            "password_hash": "hashed_pass",
+        }
+    )
+
+
+@pytest.mark.asyncio
+async def test_register_conflict(auth_service, mock_db_session, mock_user_repo, valid_user):
+    from app.schemas.auth import UserCreate
+    from app.core.exceptions import ConflictError
+    
+    request = UserCreate(
+        name="Existing User",
+        email="test@example.com",
+        password="password123"
+    )
+    
+    mock_user_repo.get_by_email.return_value = valid_user
+    
+    with pytest.raises(ConflictError, match="Email already registered"):
+        await auth_service.register(mock_db_session, request)
