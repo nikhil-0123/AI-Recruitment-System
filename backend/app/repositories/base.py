@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Generic, Iterable, List, Optional, TypeVar
+from typing import Any, Generic, Optional, TypeVar
 
 import sqlalchemy as sa
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
-from app.repositories.exceptions import DatabaseError, NotFoundError
+from app.repositories.exceptions import DatabaseError
 from app.repositories.filters import FilterParams
 from app.repositories.pagination import PaginatedResult, PageParams
 from app.repositories.sort import SortOrder, SortParams

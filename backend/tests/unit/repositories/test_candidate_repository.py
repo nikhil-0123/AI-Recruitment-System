@@ -4,7 +4,6 @@ import uuid
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.candidate import Candidate
 from app.repositories.candidate_repository import CandidateRepository
 from app.repositories.exceptions import NotFoundError
 

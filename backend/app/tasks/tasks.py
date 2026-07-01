@@ -14,7 +14,7 @@ if celery_app is not None:
         from app.db.database import get_db_context
         from app.models.async_job import AsyncJob
         from app.services.ranking_service import RankingService
-        from sqlalchemy import select, func
+        from sqlalchemy import func
 
         async def _run() -> dict[str, Any]:
             async with get_db_context() as db:
