@@ -3,8 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
 from app.core import security
+
 from app.core.exceptions import ARASBaseException, ConflictError
 from app.schemas.auth import UserCreate
+
 
 
 class AuthenticationError(ARASBaseException):
@@ -86,5 +88,5 @@ class AuthService:
             
         if not user.is_active:
             raise AuthenticationError("User account is inactive")
-            
+        
         return self.create_access_token_for_user(user)
