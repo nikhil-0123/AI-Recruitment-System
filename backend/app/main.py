@@ -117,12 +117,16 @@ def _register_routers(application: FastAPI) -> None:
     from app.api.v1.candidates import router as candidates_router
     from app.api.v1.resumes import router as resumes_router
     from app.api.v1.rankings import router as rankings_router
+    from app.api.v1.auth import router as auth_router
+    from app.api.v1.users import router as users_router
 
     application.include_router(health_router)
     application.include_router(jobs_router)
     application.include_router(candidates_router)
     application.include_router(resumes_router)
     application.include_router(rankings_router)
+    application.include_router(auth_router)
+    application.include_router(users_router)
 
 
 # ── Module-Level App Instance ──────────────────────────────────────────────────

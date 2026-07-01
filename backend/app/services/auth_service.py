@@ -3,7 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
 from app.core import security
-from app.core.exceptions import ARASBaseException
+from app.core.exceptions import ARASBaseException, ConflictError
+from app.schemas.auth import UserCreate
 
 
 class AuthenticationError(ARASBaseException):
@@ -16,6 +17,22 @@ class AuthenticationError(ARASBaseException):
 class AuthService:
     def __init__(self, user_repo: UserRepository):
         self.user_repo = user_repo
+
+    async def register(self, db: AsyncSession, request: UserCreate) -> User:
+        """
+        Registers a new user.
+        Raises ConflictError if the email is already in use.
+        """
+        user = await self.user_repo.get_by_email(db, request.email)
+        if user:
+            raise ConflictError("Email already registered")
+            
+        user_data = {
+            "email": request.email,
+            "name": request.name,
+            "password_hash": security.get_password_hash(request.password),
+        }
+        return await self.user_repo.create(db, user_data)
 
     async def authenticate_user(self, db: AsyncSession, email: str, password: str) -> User:
         """
